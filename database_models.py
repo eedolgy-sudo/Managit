@@ -7,7 +7,7 @@ class Base(DeclarativeBase):
     pass
 
 
-class Task(Base):
+class TaskDB(Base):
     __tablename__ = "tasks"
 
     __table_args__ = (
@@ -23,7 +23,7 @@ class Task(Base):
     description: Mapped[str] = mapped_column(default="")
     due_date: Mapped[datetime | None] = mapped_column(nullable=True)
 
-    parent_task_id: Mapped[int | None] = mapped_column(
+    '''parent_task_id: Mapped[int | None] = mapped_column(
         ForeignKey("tasks.id")
     )
 
@@ -47,10 +47,10 @@ class Task(Base):
 
     user: Mapped["User"] = relationship(
         back_populates="tasks"
-    )
+    )'''
 
 
-class Notification(Base):
+'''class NotificationDB(Base):
     __tablename__ = "notifications"
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -70,7 +70,7 @@ class Notification(Base):
     )
 
 
-class User(Base):
+class UserDB(Base):
     __tablename__ = "users"
 
     __table_args__ = (
@@ -88,4 +88,4 @@ class User(Base):
 
     tasks: Mapped[list["Task"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
-    )
+    )'''

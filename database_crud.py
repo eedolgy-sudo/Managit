@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
-from database_models import Base, User, Task, Notification
+from database_models import Base, TaskDB#, User, Notification
 from sqlalchemy import create_engine, select, event, update
 
 engine = create_engine('sqlite:///managit_database.db', echo=True)
+
 
 @event.listens_for(engine, "connect")
 def enable_foreign_keys(dbapi_connection, connection_record):
@@ -28,10 +29,21 @@ def add_data(input_data: list):
             session.add_all(input_data)
 
 
-def select_users():
+'''def select_users():
     with Session(engine) as session:
         stmt = select(User)
+        return session.scalars(stmt).all()'''
+
+
+def select_tasks():
+    with Session(engine) as session:
+        stmt = select(TaskDB)
         return session.scalars(stmt).all()
+
+
+def select_task(task_id):
+    with Session(engine) as session:
+        return session.get(TaskDB, task_id)
 
 
 def select_user_data(model, user_id):
@@ -40,26 +52,16 @@ def select_user_data(model, user_id):
         return session.scalars(stmt).all()
 
 
-def select_notifications_for_task(task_id):
+'''def select_notifications_for_task(task_id):
     with Session(engine) as session:
         stmt = select(Notification).where(Notification.task_id == task_id)
-        return session.scalars(stmt).all()
+        return session.scalars(stmt).all()'''
 
 
-def update_data(model, record_id, user_id, changes: dict):
+def update_data(model, record_id, changes: dict):
     with Session(engine) as session:
         with session.begin():
             stmt = select(model).where(model.id == record_id)
-
-            if model == Task:
-                stmt = stmt.where(Task.user_id == user_id)
-            elif model == Notification:
-                stmt = stmt.join(Notification.task).where(
-                    Task.user_id == user_id
-                )
-            else:
-                raise ValueError("Unsupported model")
-
             record = session.scalar(stmt)
 
             if record is None:
@@ -71,19 +73,19 @@ def update_data(model, record_id, user_id, changes: dict):
             return True
 
 
-def delete_data(model, user_id, record_id):
+def delete_data(model, record_id):
     with Session(engine) as session:
         with session.begin():
             stmt = select(model).where(model.id == record_id)
 
-            if model == Task:
-                stmt = stmt.where(Task.user_id == user_id)
+            '''if model == TaskDB:
+                stmt = stmt.where(TaskDB.user_id == user_id)
             elif model == Notification:
-                stmt = stmt.join(Notification.task).where(
-                    Task.user_id == user_id
+                stmt = stmt.join(Notification.TaskDB).where(
+                    TaskDB.user_id == user_id
                 )
             else:
-                raise ValueError("Unsupported model")
+                raise ValueError("Unsupported model")'''
 
             record = session.scalar(stmt)
 
